@@ -37,7 +37,7 @@ dependencies:
 
   # State management — the interview flow is a natural state machine.
   flutter_bloc: ^9.1.0
-  equatable: ^2.0.5
+  equatable: ^3.0.0
 
   # Routing
   go_router: ^15.1.2
