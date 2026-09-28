@@ -53,3 +53,32 @@ jobs:
       # never exercises since it never compiles for a real platform target.
       - name: Build debug APK
         run: flutter build apk --debug
+
+  file-issue-on-failure:
+    name: File issue on main failure
+    needs: [analyze-and-test, build-android]
+    if: |
+      always() &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push' &&
+      (needs.analyze-and-test.result == 'failure' || needs.build-android.result == 'failure')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          FAILED_JOBS: >-
+            ${{ needs.analyze-and-test.result == 'failure' && 'Analyze & Test' || '' }}${{
+            needs.analyze-and-test.result == 'failure' && needs.build-android.result == 'failure' && ', ' || '' }}${{
+            needs.build-android.result == 'failure' && 'Build Android (debug)' || '' }}
+        with:
+          filename: .github/ISSUE_TEMPLATE/ci-failure.md
+          update_existing: true

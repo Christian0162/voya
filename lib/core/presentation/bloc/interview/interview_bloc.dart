@@ -37,6 +37,10 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
   }) : _ai = aiService,
        _stt = speechToTextService,
        _tts = textToSpeechService,
+       // `this._repository` would rename this named parameter's external
+       // label to `_repository` (private, per Dart's initializing-formal
+       // rules), breaking every `InterviewBloc(repository: ...)` call site.
+       // ignore: prefer_initializing_formals
        _repository = repository,
        _permissions = permissionService ?? PermissionServiceImpl(),
        _uuid = uuid ?? const Uuid(),
