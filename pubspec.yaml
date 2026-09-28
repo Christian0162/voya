@@ -47,7 +47,7 @@ dependencies:
   # `IconData` (now a sealed/final class it can no longer subclass), so
   # Material's rounded icons are used consistently instead (spec section 12
   # allows Material Icons "where appropriate").
-  google_fonts: ^6.2.1
+  google_fonts: ^8.2.1
 
   # Voice
   speech_to_text: ^7.0.0
