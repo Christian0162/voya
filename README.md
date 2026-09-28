@@ -6,6 +6,7 @@
 <p align="center"><em>Practice the interview before the real one.</em></p>
 
 <p align="center">
+  <img src="https://github.com/Christian0162/voya/actions/workflows/ci.yml/badge.svg" alt="CI status" />
   <img src="https://img.shields.io/badge/version-1.0.0-4F46E5" alt="version" />
   <img src="https://img.shields.io/badge/flutter-3.35%2B-4F46E5" alt="flutter" />
   <img src="https://img.shields.io/badge/dart-3.13%2B-4F46E5" alt="dart" />
@@ -61,9 +62,13 @@ whole app is voice-first.
 ### 5. (Optional) run checks
 
 ```bash
+dart format --output=none --set-exit-if-changed .
 flutter analyze
 flutter test
 ```
+
+These same checks (plus a debug Android build) run automatically in
+[CI](.github/workflows/ci.yml) on every push and pull request to `main`.
 
 ---
 
