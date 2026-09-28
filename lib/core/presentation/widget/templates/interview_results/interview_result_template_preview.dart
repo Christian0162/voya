@@ -30,7 +30,10 @@ class InterviewResultTemplatePreview extends StatelessWidget {
         answerQuality: 0.74,
         speakingPace: 0.81,
         consistency: 0.91,
-        strengths: const ['Clear explanation of previous experience', 'Strong knowledge of the role'],
+        strengths: const [
+          'Clear explanation of previous experience',
+          'Strong knowledge of the role',
+        ],
         practiceAreas: const ['Some answers were too short', 'A few filler words were detected'],
         questionsToPractice: const ['Why do you want to work abroad?'],
         fillerWordCounts: const {'um': 7, 'uh': 3, 'like': 2},

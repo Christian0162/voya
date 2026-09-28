@@ -115,7 +115,8 @@ class _InterviewScreenState extends State<InterviewScreen> {
           hasTranscript: state.turns.isNotEmpty,
           onEndInterviewPressed: () => _confirmEnd(context),
           onShowTranscript: () => _showTranscript(context, state),
-          onRetryListening: () => context.read<InterviewBloc>().add(const RetryListeningRequested()),
+          onRetryListening: () =>
+              context.read<InterviewBloc>().add(const RetryListeningRequested()),
         );
       },
     );

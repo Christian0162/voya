@@ -6,10 +6,7 @@ abstract class TextToSpeechService {
   /// Speaks [text] and completes when playback finishes. [onAmplitude] is a
   /// best-effort synthetic amplitude callback (device TTS engines rarely
   /// expose real amplitude) used to drive the "AI speaking" waveform.
-  Future<void> speak(
-    String text, {
-    void Function(double amplitude)? onAmplitude,
-  });
+  Future<void> speak(String text, {void Function(double amplitude)? onAmplitude});
 
   Future<void> stop();
 

@@ -24,10 +24,7 @@ class InterviewSession extends Equatable {
 
   bool get isComplete => endedAt != null;
 
-  InterviewSession copyWith({
-    List<InterviewTurn>? turns,
-    DateTime? endedAt,
-  }) {
+  InterviewSession copyWith({List<InterviewTurn>? turns, DateTime? endedAt}) {
     return InterviewSession(
       id: id,
       configuration: configuration,

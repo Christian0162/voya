@@ -5,6 +5,7 @@ import 'package:voya/core/domain/interview_results/entities/interview_result.dar
 import 'package:voya/core/domain/interview_setup/entities/interview_configuration.dart';
 import 'package:voya/core/domain/interview/entities/interview_question.dart';
 import 'package:voya/core/domain/interview/entities/interview_turn.dart';
+
 import 'interview_status.dart';
 
 class InterviewState extends Equatable {
@@ -75,15 +76,15 @@ class InterviewState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        configuration,
-        sessionId,
-        turns,
-        currentQuestion,
-        liveTranscript,
-        amplitude,
-        elapsed,
-        failure,
-        result,
-      ];
+    status,
+    configuration,
+    sessionId,
+    turns,
+    currentQuestion,
+    liveTranscript,
+    amplitude,
+    elapsed,
+    failure,
+    result,
+  ];
 }

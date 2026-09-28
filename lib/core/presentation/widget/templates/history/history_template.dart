@@ -22,9 +22,7 @@ class HistoryTemplate extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('History')),
-      body: SafeArea(
-        child: _buildBody(context),
-      ),
+      body: SafeArea(child: _buildBody(context)),
     );
   }
 

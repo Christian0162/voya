@@ -37,9 +37,24 @@ class HomeTemplatePreview extends StatelessWidget {
           ),
         ],
         progressMetrics: const [
-          ProgressMetric(label: 'Speaking', value: 0.82, icon: Icons.mic_rounded, color: AppColors.primary),
-          ProgressMetric(label: 'Confidence', value: 0.76, icon: Icons.bolt_rounded, color: AppColors.warning),
-          ProgressMetric(label: 'Clarity', value: 0.88, icon: Icons.chat_bubble_rounded, color: AppColors.success),
+          ProgressMetric(
+            label: 'Speaking',
+            value: 0.82,
+            icon: Icons.mic_rounded,
+            color: AppColors.primary,
+          ),
+          ProgressMetric(
+            label: 'Confidence',
+            value: 0.76,
+            icon: Icons.bolt_rounded,
+            color: AppColors.warning,
+          ),
+          ProgressMetric(
+            label: 'Clarity',
+            value: 0.88,
+            icon: Icons.chat_bubble_rounded,
+            color: AppColors.success,
+          ),
         ],
         onStartInterview: () {},
         onRefresh: () async {},

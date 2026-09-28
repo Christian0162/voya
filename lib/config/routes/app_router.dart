@@ -35,39 +35,35 @@ class AppRouter {
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => AppShell(navigationShell: navigationShell),
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/home',
-              builder: (context, state) => HomeScreen(repository: repository),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/history',
-              builder: (context, state) => HistoryScreen(repository: repository),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/profile',
-              builder: (context, state) => const ProfileScreen(),
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => HomeScreen(repository: repository),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/history',
+                builder: (context, state) => HistoryScreen(repository: repository),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen())],
+          ),
         ],
       ),
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
-      ),
+      GoRoute(path: '/settings', builder: (context, state) => const SettingsScreen()),
       GoRoute(
         path: '/interview/setup',
         builder: (context, state) => InterviewSetupScreen(
           onConfigured: (configuration) {
             final sessionId = const Uuid().v4();
-            GoRouter.of(context).pushReplacement(
-              '/interview/session/$sessionId',
-              extra: configuration,
-            );
+            GoRouter.of(context)
+                .pushReplacement('/interview/session/$sessionId', extra: configuration);
           },
         ),
       ),

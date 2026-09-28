@@ -15,8 +15,7 @@ abstract class Failure extends Equatable {
 }
 
 class MicrophonePermissionFailure extends Failure {
-  const MicrophonePermissionFailure()
-      : super('Microphone access is needed to hear your answers.');
+  const MicrophonePermissionFailure() : super('Microphone access is needed to hear your answers.');
 }
 
 class NoMicrophoneFailure extends Failure {
@@ -25,7 +24,7 @@ class NoMicrophoneFailure extends Failure {
 
 class SpeechRecognitionFailure extends Failure {
   const SpeechRecognitionFailure([String? reason])
-      : super(reason ?? "We couldn't hear your answer clearly.");
+    : super(reason ?? "We couldn't hear your answer clearly.");
 }
 
 class TextToSpeechFailure extends Failure {
@@ -38,7 +37,7 @@ class NetworkFailure extends Failure {
 
 class AiProviderFailure extends Failure {
   const AiProviderFailure([String? reason])
-      : super(reason ?? 'The AI interviewer is unavailable right now.');
+    : super(reason ?? 'The AI interviewer is unavailable right now.');
 }
 
 class UnknownFailure extends Failure {

@@ -45,12 +45,14 @@ class _InterviewSetupScreenState extends State<InterviewSetupScreen> {
 
   void _next() {
     if (_step == _stepCount - 1) {
-      widget.onConfigured(InterviewConfiguration(
-        country: _country!,
-        purpose: _purpose!,
-        difficulty: _difficulty!,
-        durationMinutes: _duration,
-      ));
+      widget.onConfigured(
+        InterviewConfiguration(
+          country: _country!,
+          purpose: _purpose!,
+          difficulty: _difficulty!,
+          durationMinutes: _duration,
+        ),
+      );
       return;
     }
     setState(() => _step += 1);
@@ -63,7 +65,10 @@ class _InterviewSetupScreenState extends State<InterviewSetupScreen> {
       return;
     }
     setState(() => _step -= 1);
-    _pageController.previousPage(duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
+    _pageController.previousPage(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
   }
 
   @override

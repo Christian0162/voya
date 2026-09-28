@@ -26,7 +26,10 @@ class ProfileTemplate extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Guest Practicer', style: Theme.of(context).textTheme.titleMedium),
-                        Text('Local practice history only', style: Theme.of(context).textTheme.bodySmall),
+                        Text(
+                          'Local practice history only',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ],
                     ),
                   ),

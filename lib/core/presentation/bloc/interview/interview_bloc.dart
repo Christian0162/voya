@@ -14,6 +14,7 @@ import 'package:voya/core/domain/interview/services/speech_to_text_service.dart'
 import 'package:voya/core/domain/interview/services/text_to_speech_service.dart';
 import 'package:voya/core/data/services/answer_builder.dart';
 import 'package:voya/core/data/services/permission_service_impl.dart';
+
 import 'interview_event.dart';
 import 'interview_state.dart';
 import 'interview_status.dart';
@@ -33,13 +34,13 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
     required InterviewRepository repository,
     PermissionService? permissionService,
     Uuid? uuid,
-  })  : _ai = aiService,
-        _stt = speechToTextService,
-        _tts = textToSpeechService,
-        _repository = repository,
-        _permissions = permissionService ?? PermissionServiceImpl(),
-        _uuid = uuid ?? const Uuid(),
-        super(const InterviewState()) {
+  }) : _ai = aiService,
+       _stt = speechToTextService,
+       _tts = textToSpeechService,
+       _repository = repository,
+       _permissions = permissionService ?? PermissionServiceImpl(),
+       _uuid = uuid ?? const Uuid(),
+       super(const InterviewState()) {
     on<StartInterviewRequested>(_onStart);
     on<AiFinishedSpeaking>(_onAiFinishedSpeaking);
     on<UserSpeechUpdated>(_onUserSpeechUpdated);
@@ -62,11 +63,7 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
   /// past the recognizer's timeout, or — on iOS — a transient retry signal)
   /// rather than a real failure. See speech_to_text's [SpeechErrorListener]
   /// docs for the full list Android/iOS can report.
-  static const _recoverableSpeechErrors = {
-    'error_no_match',
-    'error_speech_timeout',
-    'error_retry',
-  };
+  static const _recoverableSpeechErrors = {'error_no_match', 'error_speech_timeout', 'error_retry'};
   static const _maxAutoRetries = 2;
 
   Timer? _clock;
@@ -76,11 +73,13 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
   int _consecutiveNoMatchCount = 0;
 
   Future<void> _onStart(StartInterviewRequested event, Emitter<InterviewState> emit) async {
-    emit(InterviewState(
-      status: InterviewStatus.preparing,
-      configuration: event.configuration,
-      sessionId: _uuid.v4(),
-    ));
+    emit(
+      InterviewState(
+        status: InterviewStatus.preparing,
+        configuration: event.configuration,
+        sessionId: _uuid.v4(),
+      ),
+    );
 
     final hasMic = await _permissions.requestMicrophone();
     if (!hasMic) {
@@ -115,10 +114,7 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
     }
   }
 
-  Future<void> _onAiFinishedSpeaking(
-    AiFinishedSpeaking event,
-    Emitter<InterviewState> emit,
-  ) async {
+  Future<void> _onAiFinishedSpeaking(AiFinishedSpeaking event, Emitter<InterviewState> emit) async {
     await _startListening(emit);
   }
 
@@ -136,15 +132,9 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
     );
   }
 
-  Future<void> _onUserSpeechUpdated(
-    UserSpeechUpdated event,
-    Emitter<InterviewState> emit,
-  ) async {
+  Future<void> _onUserSpeechUpdated(UserSpeechUpdated event, Emitter<InterviewState> emit) async {
     if (!event.isFinal) {
-      emit(state.copyWith(
-        status: InterviewStatus.userSpeaking,
-        liveTranscript: event.transcript,
-      ));
+      emit(state.copyWith(status: InterviewStatus.userSpeaking, liveTranscript: event.transcript));
       return;
     }
 
@@ -164,12 +154,14 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
     );
 
     final updatedTurns = [...state.turns, InterviewTurn(question: question, answer: answer)];
-    emit(state.copyWith(
-      status: InterviewStatus.processingAnswer,
-      turns: updatedTurns,
-      liveTranscript: '',
-      amplitude: 0,
-    ));
+    emit(
+      state.copyWith(
+        status: InterviewStatus.processingAnswer,
+        turns: updatedTurns,
+        liveTranscript: '',
+        amplitude: 0,
+      ),
+    );
 
     unawaited(_processAnswer(updatedTurns.last, updatedTurns, emit));
   }
@@ -250,8 +242,8 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
   }
 
   Future<void> _onSpeechError(SpeechErrorOccurred event, Emitter<InterviewState> emit) async {
-    final isListeningPhase = state.status == InterviewStatus.listening ||
-        state.status == InterviewStatus.userSpeaking;
+    final isListeningPhase =
+        state.status == InterviewStatus.listening || state.status == InterviewStatus.userSpeaking;
     final isRecoverable = _recoverableSpeechErrors.contains(event.message);
 
     if (isListeningPhase && isRecoverable && _consecutiveNoMatchCount < _maxAutoRetries) {
@@ -267,17 +259,17 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
     _consecutiveNoMatchCount = 0;
     final failure = isRecoverable
         ? const SpeechRecognitionFailure(
-            "We still couldn't hear a clear answer. Check your microphone and try again.")
+            "We still couldn't hear a clear answer. Check your microphone and try again.",
+          )
         : SpeechRecognitionFailure(event.message);
 
     emit(state.copyWith(status: InterviewStatus.error, failure: failure));
   }
 
   void _onMicPermissionDenied(MicrophonePermissionDenied event, Emitter<InterviewState> emit) {
-    emit(state.copyWith(
-      status: InterviewStatus.error,
-      failure: const MicrophonePermissionFailure(),
-    ));
+    emit(
+      state.copyWith(status: InterviewStatus.error, failure: const MicrophonePermissionFailure()),
+    );
   }
 
   Future<void> _onRetryListening(

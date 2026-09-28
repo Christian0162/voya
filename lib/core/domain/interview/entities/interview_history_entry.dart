@@ -33,14 +33,14 @@ class InterviewHistoryEntry extends Equatable {
 
   @override
   List<Object?> get props => [
-        sessionId,
-        countryName,
-        countryFlag,
-        purpose,
-        difficulty,
-        durationMinutes,
-        startedAt,
-        turnCount,
-        overallScore,
-      ];
+    sessionId,
+    countryName,
+    countryFlag,
+    purpose,
+    difficulty,
+    durationMinutes,
+    startedAt,
+    turnCount,
+    overallScore,
+  ];
 }

@@ -36,17 +36,20 @@ class MdPrimaryButton extends StatelessWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (icon != null) ...[
-                Icon(icon, size: 20),
-                const SizedBox(width: AppSpacing.sm),
-              ],
+              if (icon != null) ...[Icon(icon, size: 20), const SizedBox(width: AppSpacing.sm)],
               Text(label),
             ],
           );
 
     final Widget button = switch (variant) {
-      MdButtonVariant.primary => ElevatedButton(onPressed: disabled ? null : onPressed, child: child),
-      MdButtonVariant.secondary => OutlinedButton(onPressed: disabled ? null : onPressed, child: child),
+      MdButtonVariant.primary => ElevatedButton(
+        onPressed: disabled ? null : onPressed,
+        child: child,
+      ),
+      MdButtonVariant.secondary => OutlinedButton(
+        onPressed: disabled ? null : onPressed,
+        child: child,
+      ),
       MdButtonVariant.text => TextButton(onPressed: disabled ? null : onPressed, child: child),
     };
 

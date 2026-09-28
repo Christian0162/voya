@@ -55,24 +55,24 @@ void main() {
     registerFallbackValue(configuration);
     registerFallbackValue(<InterviewTurn>[]);
     registerFallbackValue(openingQuestion);
-    registerFallbackValue(InterviewSession(
-      id: 'fallback',
-      configuration: configuration,
-      startedAt: DateTime(2026),
-    ));
-    registerFallbackValue(InterviewResult(
-      sessionId: 'fallback',
-      completedAt: DateTime(2026),
-      communication: 0,
-      clarity: 0,
-      answerQuality: 0,
-      speakingPace: 0,
-      consistency: 0,
-      strengths: const [],
-      practiceAreas: const [],
-      questionsToPractice: const [],
-      fillerWordCounts: const {},
-    ));
+    registerFallbackValue(
+      InterviewSession(id: 'fallback', configuration: configuration, startedAt: DateTime(2026)),
+    );
+    registerFallbackValue(
+      InterviewResult(
+        sessionId: 'fallback',
+        completedAt: DateTime(2026),
+        communication: 0,
+        clarity: 0,
+        answerQuality: 0,
+        speakingPace: 0,
+        consistency: 0,
+        strengths: const [],
+        practiceAreas: const [],
+        questionsToPractice: const [],
+        fillerWordCounts: const {},
+      ),
+    );
   });
 
   setUp(() {
@@ -93,12 +93,12 @@ void main() {
   });
 
   InterviewBloc buildBloc() => InterviewBloc(
-        aiService: ai,
-        speechToTextService: stt,
-        textToSpeechService: tts,
-        repository: repository,
-        permissionService: permissions,
-      );
+    aiService: ai,
+    speechToTextService: stt,
+    textToSpeechService: tts,
+    repository: repository,
+    permissionService: permissions,
+  );
 
   blocTest<InterviewBloc, dynamic>(
     'emits an error state when microphone permission is denied',
@@ -120,13 +120,14 @@ void main() {
     setUp: () {
       when(() => permissions.requestMicrophone()).thenAnswer((_) async => true);
       when(() => ai.generateOpeningQuestion(any())).thenAnswer((_) async => openingQuestion);
-      when(() => tts.speak(any(), onAmplitude: any(named: 'onAmplitude')))
-          .thenAnswer((_) async {});
-      when(() => stt.startListening(
-            onResult: any(named: 'onResult'),
-            onSoundLevelChange: any(named: 'onSoundLevelChange'),
-            onError: any(named: 'onError'),
-          )).thenAnswer((_) async {});
+      when(() => tts.speak(any(), onAmplitude: any(named: 'onAmplitude'))).thenAnswer((_) async {});
+      when(
+        () => stt.startListening(
+          onResult: any(named: 'onResult'),
+          onSoundLevelChange: any(named: 'onSoundLevelChange'),
+          onError: any(named: 'onError'),
+        ),
+      ).thenAnswer((_) async {});
     },
     build: buildBloc,
     act: (bloc) => bloc.add(StartInterviewRequested(configuration)),
@@ -144,30 +145,35 @@ void main() {
     setUp: () {
       when(() => permissions.requestMicrophone()).thenAnswer((_) async => true);
       when(() => ai.generateOpeningQuestion(any())).thenAnswer((_) async => openingQuestion);
-      when(() => tts.speak(any(), onAmplitude: any(named: 'onAmplitude')))
-          .thenAnswer((_) async {});
-      when(() => stt.startListening(
-            onResult: any(named: 'onResult'),
-            onSoundLevelChange: any(named: 'onSoundLevelChange'),
-            onError: any(named: 'onError'),
-          )).thenAnswer((_) async {});
-      when(() => ai.generateFeedback(
-            configuration: any(named: 'configuration'),
-            history: any(named: 'history'),
-            sessionId: any(named: 'sessionId'),
-          )).thenAnswer((_) async => InterviewResult(
-            sessionId: 'session-1',
-            completedAt: DateTime(2026),
-            communication: 0.5,
-            clarity: 0.5,
-            answerQuality: 0.5,
-            speakingPace: 0.5,
-            consistency: 0.5,
-            strengths: const ['Good effort'],
-            practiceAreas: const [],
-            questionsToPractice: const [],
-            fillerWordCounts: const {},
-          ));
+      when(() => tts.speak(any(), onAmplitude: any(named: 'onAmplitude'))).thenAnswer((_) async {});
+      when(
+        () => stt.startListening(
+          onResult: any(named: 'onResult'),
+          onSoundLevelChange: any(named: 'onSoundLevelChange'),
+          onError: any(named: 'onError'),
+        ),
+      ).thenAnswer((_) async {});
+      when(
+        () => ai.generateFeedback(
+          configuration: any(named: 'configuration'),
+          history: any(named: 'history'),
+          sessionId: any(named: 'sessionId'),
+        ),
+      ).thenAnswer(
+        (_) async => InterviewResult(
+          sessionId: 'session-1',
+          completedAt: DateTime(2026),
+          communication: 0.5,
+          clarity: 0.5,
+          answerQuality: 0.5,
+          speakingPace: 0.5,
+          consistency: 0.5,
+          strengths: const ['Good effort'],
+          practiceAreas: const [],
+          questionsToPractice: const [],
+          fillerWordCounts: const {},
+        ),
+      );
     },
     build: buildBloc,
     act: (bloc) async {
@@ -189,13 +195,14 @@ void main() {
     setUp: () {
       when(() => permissions.requestMicrophone()).thenAnswer((_) async => true);
       when(() => ai.generateOpeningQuestion(any())).thenAnswer((_) async => openingQuestion);
-      when(() => tts.speak(any(), onAmplitude: any(named: 'onAmplitude')))
-          .thenAnswer((_) async {});
-      when(() => stt.startListening(
-            onResult: any(named: 'onResult'),
-            onSoundLevelChange: any(named: 'onSoundLevelChange'),
-            onError: any(named: 'onError'),
-          )).thenAnswer((_) async {});
+      when(() => tts.speak(any(), onAmplitude: any(named: 'onAmplitude'))).thenAnswer((_) async {});
+      when(
+        () => stt.startListening(
+          onResult: any(named: 'onResult'),
+          onSoundLevelChange: any(named: 'onSoundLevelChange'),
+          onError: any(named: 'onError'),
+        ),
+      ).thenAnswer((_) async {});
     },
     build: buildBloc,
     act: (bloc) async {
@@ -208,11 +215,13 @@ void main() {
       expect(bloc.state.status, InterviewStatus.listening);
       expect(bloc.state.failure, isNull);
       // Once for the initial question, once for the retry after the error.
-      verify(() => stt.startListening(
-            onResult: any(named: 'onResult'),
-            onSoundLevelChange: any(named: 'onSoundLevelChange'),
-            onError: any(named: 'onError'),
-          )).called(2);
+      verify(
+        () => stt.startListening(
+          onResult: any(named: 'onResult'),
+          onSoundLevelChange: any(named: 'onSoundLevelChange'),
+          onError: any(named: 'onError'),
+        ),
+      ).called(2);
     },
   );
 
@@ -221,13 +230,14 @@ void main() {
     setUp: () {
       when(() => permissions.requestMicrophone()).thenAnswer((_) async => true);
       when(() => ai.generateOpeningQuestion(any())).thenAnswer((_) async => openingQuestion);
-      when(() => tts.speak(any(), onAmplitude: any(named: 'onAmplitude')))
-          .thenAnswer((_) async {});
-      when(() => stt.startListening(
-            onResult: any(named: 'onResult'),
-            onSoundLevelChange: any(named: 'onSoundLevelChange'),
-            onError: any(named: 'onError'),
-          )).thenAnswer((_) async {});
+      when(() => tts.speak(any(), onAmplitude: any(named: 'onAmplitude'))).thenAnswer((_) async {});
+      when(
+        () => stt.startListening(
+          onResult: any(named: 'onResult'),
+          onSoundLevelChange: any(named: 'onSoundLevelChange'),
+          onError: any(named: 'onError'),
+        ),
+      ).thenAnswer((_) async {});
     },
     build: buildBloc,
     act: (bloc) async {

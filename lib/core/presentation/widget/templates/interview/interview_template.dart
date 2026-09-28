@@ -102,7 +102,10 @@ class _TopBar extends StatelessWidget {
               const SizedBox(width: AppSpacing.xs),
               Text(
                 '$minutes:$seconds',
-                style: const TextStyle(color: Colors.white70, fontVariations: [FontVariation('wght', 600)]),
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontVariations: [FontVariation('wght', 600)],
+                ),
               ),
             ],
           ),
@@ -159,7 +162,8 @@ class _StatusIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showWaveform = state.status == InterviewStatus.aiSpeaking ||
+    final showWaveform =
+        state.status == InterviewStatus.aiSpeaking ||
         state.status == InterviewStatus.listening ||
         state.status == InterviewStatus.userSpeaking;
 

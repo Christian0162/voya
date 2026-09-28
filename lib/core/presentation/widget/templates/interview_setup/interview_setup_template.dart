@@ -81,7 +81,10 @@ class InterviewSetupTemplate extends StatelessWidget {
                   _buildStep(
                     title: 'Choose a difficulty',
                     subtitle: 'You can change this any time in your next practice.',
-                    child: MdDifficultySelector(selected: difficulty, onSelected: onDifficultySelected),
+                    child: MdDifficultySelector(
+                      selected: difficulty,
+                      onSelected: onDifficultySelected,
+                    ),
                   ),
                   _buildStep(
                     title: 'How long should it be?',

@@ -26,7 +26,10 @@ class MdResultMetric extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(label, style: Theme.of(context).textTheme.titleMedium),
-              Text('$percent%', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: color)),
+              Text(
+                '$percent%',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: color),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),

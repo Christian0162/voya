@@ -42,7 +42,8 @@ class SettingsTemplate extends StatelessWidget {
                 icon: Icons.shield_rounded,
                 iconColor: AppColors.success,
                 title: 'Your data',
-                subtitle: 'Only transcripts and scores are stored, on this device. No audio is kept.',
+                subtitle:
+                    'Only transcripts and scores are stored, on this device. No audio is kept.',
                 showChevron: false,
               ),
             ),

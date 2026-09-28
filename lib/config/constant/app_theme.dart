@@ -69,9 +69,7 @@ class AppTheme {
           // full width even when wrapped with expand: false.
           minimumSize: const Size(AppSpacing.minTouchTarget, AppSpacing.minTouchTarget + 8),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
           textStyle: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
@@ -80,9 +78,7 @@ class AppTheme {
           foregroundColor: textPrimary,
           minimumSize: const Size(AppSpacing.minTouchTarget, AppSpacing.minTouchTarget + 8),
           side: BorderSide(color: border),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -94,7 +90,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isDark ? AppColors.surfaceAltDark : AppColors.surfaceAltLight,
-        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           borderSide: BorderSide.none,

@@ -7,6 +7,7 @@ import 'package:voya/core/domain/interview/entities/answer_analysis.dart';
 import 'package:voya/core/domain/interview/entities/interview_question.dart';
 import 'package:voya/core/domain/interview/entities/interview_turn.dart';
 import 'package:voya/core/domain/interview/services/ai_interview_service.dart';
+
 import 'question_bank.dart';
 
 /// Local, rule-based interview "AI".
@@ -37,17 +38,10 @@ class MockAIInterviewService implements AIInterviewService {
   ];
 
   @override
-  Future<InterviewQuestion> generateOpeningQuestion(
-    InterviewConfiguration configuration,
-  ) async {
+  Future<InterviewQuestion> generateOpeningQuestion(InterviewConfiguration configuration) async {
     await _thinkingDelay();
     final bank = QuestionBank.forPurpose(configuration.purpose);
-    return InterviewQuestion(
-      id: 'q0',
-      text: bank.first,
-      kind: QuestionKind.opening,
-      order: 0,
-    );
+    return InterviewQuestion(id: 'q0', text: bank.first, kind: QuestionKind.opening, order: 0);
   }
 
   @override
@@ -160,13 +154,16 @@ class MockAIInterviewService implements AIInterviewService {
 
     if (totalFillerCount > 5) {
       practiceAreas.add(
-          'Several filler words were detected ($totalFillerCount total). Try pausing silently instead.');
+        'Several filler words were detected ($totalFillerCount total). Try pausing silently instead.',
+      );
     }
     if (vagueCount > 0) {
       practiceAreas.add('$vagueCount answer${vagueCount == 1 ? '' : 's'} could be more specific.');
     }
     if (avgPace > 170) {
-      practiceAreas.add('Your speaking pace increased on some answers — try slowing down slightly.');
+      practiceAreas.add(
+        'Your speaking pace increased on some answers — try slowing down slightly.',
+      );
     }
     if (practiceAreas.isEmpty) {
       practiceAreas.add('Keep practicing to build even more consistency under pressure.');

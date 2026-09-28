@@ -17,10 +17,7 @@ class SpeechToTextServiceImpl implements SpeechToTextService {
 
   @override
   Future<bool> initialize() async {
-    _available = await _speech.initialize(
-      onError: (_) {},
-      onStatus: (_) {},
-    );
+    _available = await _speech.initialize(onError: (_) {}, onStatus: (_) {});
     return _available;
   }
 

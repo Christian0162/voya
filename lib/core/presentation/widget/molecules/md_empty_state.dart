@@ -42,17 +42,9 @@ class MdEmptyState extends StatelessWidget {
             child: Icon(icon, color: iconColor, size: 32),
           ),
           const SizedBox(height: AppSpacing.lg),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text(title, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: AppSpacing.xs),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          Text(message, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium),
           if (actionLabel != null && onAction != null) ...[
             const SizedBox(height: AppSpacing.xl),
             MdPrimaryButton(label: actionLabel!, onPressed: onAction, expand: false),

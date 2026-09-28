@@ -76,16 +76,16 @@ class InterviewRepositoryImpl implements InterviewRepository {
   }
 
   Map<String, dynamic> _sessionToJson(InterviewSession session) => {
-        'id': session.id,
-        'countryName': session.configuration.country.name,
-        'countryFlag': session.configuration.country.flagEmoji,
-        'purpose': session.configuration.purpose.name,
-        'difficulty': session.configuration.difficulty.name,
-        'durationMinutes': session.configuration.durationMinutes,
-        'startedAt': session.startedAt.toIso8601String(),
-        'turnCount': session.turns.length,
-        'overallScore': null,
-      };
+    'id': session.id,
+    'countryName': session.configuration.country.name,
+    'countryFlag': session.configuration.country.flagEmoji,
+    'purpose': session.configuration.purpose.name,
+    'difficulty': session.configuration.difficulty.name,
+    'durationMinutes': session.configuration.durationMinutes,
+    'startedAt': session.startedAt.toIso8601String(),
+    'turnCount': session.turns.length,
+    'overallScore': null,
+  };
 
   InterviewHistoryEntry _historyEntryFromJson(Map<String, dynamic> json) {
     return InterviewHistoryEntry(
@@ -102,18 +102,18 @@ class InterviewRepositoryImpl implements InterviewRepository {
   }
 
   Map<String, dynamic> _resultToJson(InterviewResult result) => {
-        'sessionId': result.sessionId,
-        'completedAt': result.completedAt.toIso8601String(),
-        'communication': result.communication,
-        'clarity': result.clarity,
-        'answerQuality': result.answerQuality,
-        'speakingPace': result.speakingPace,
-        'consistency': result.consistency,
-        'strengths': result.strengths,
-        'practiceAreas': result.practiceAreas,
-        'questionsToPractice': result.questionsToPractice,
-        'fillerWordCounts': result.fillerWordCounts,
-      };
+    'sessionId': result.sessionId,
+    'completedAt': result.completedAt.toIso8601String(),
+    'communication': result.communication,
+    'clarity': result.clarity,
+    'answerQuality': result.answerQuality,
+    'speakingPace': result.speakingPace,
+    'consistency': result.consistency,
+    'strengths': result.strengths,
+    'practiceAreas': result.practiceAreas,
+    'questionsToPractice': result.questionsToPractice,
+    'fillerWordCounts': result.fillerWordCounts,
+  };
 
   InterviewResult _resultFromJson(String sessionId, Map<String, dynamic> json) {
     return InterviewResult(

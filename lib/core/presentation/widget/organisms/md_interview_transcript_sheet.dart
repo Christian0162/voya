@@ -32,7 +32,10 @@ class MdInterviewTranscriptSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            const Text('Transcript', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+            const Text(
+              'Transcript',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
+            ),
             const SizedBox(height: AppSpacing.md),
             Expanded(
               child: ListView.builder(
@@ -46,7 +49,11 @@ class MdInterviewTranscriptSheet extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _TranscriptBubble(label: 'AI', text: turn.question.text, color: AppColors.primaryLight),
+                        _TranscriptBubble(
+                          label: 'AI',
+                          text: turn.question.text,
+                          color: AppColors.primaryLight,
+                        ),
                         if (turn.answer != null) ...[
                           const SizedBox(height: AppSpacing.sm),
                           _TranscriptBubble(
@@ -82,7 +89,12 @@ class _TranscriptBubble extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+          style: TextStyle(
+            color: color,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+          ),
         ),
         const SizedBox(height: 2),
         Text(text, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.4)),

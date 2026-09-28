@@ -29,6 +29,12 @@ class InterviewAnswer extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [questionId, transcript, spokenDuration, fillerWordCounts, wordCount, wasVague];
+  List<Object?> get props => [
+    questionId,
+    transcript,
+    spokenDuration,
+    fillerWordCounts,
+    wordCount,
+    wasVague,
+  ];
 }

@@ -41,7 +41,11 @@ class MdHomeHeroCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Practice your answers out loud before the real thing.',
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 14, height: 1.4),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.85),
+              fontSize: 14,
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: AppSpacing.xl),
           SizedBox(

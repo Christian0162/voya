@@ -75,7 +75,8 @@ Future<void> _capture(WidgetTester tester, Widget widget, String filename) async
   // runAsync lets that I/O actually complete before capturing.
   final bytes = await tester.runAsync(() async {
     await tester.pumpAndSettle();
-    final boundary = tester.renderObject(find.byType(RepaintBoundary).first) as RenderRepaintBoundary;
+    final boundary =
+        tester.renderObject(find.byType(RepaintBoundary).first) as RenderRepaintBoundary;
     final image = await boundary.toImage(pixelRatio: 1.0);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     return byteData!.buffer.asUint8List();

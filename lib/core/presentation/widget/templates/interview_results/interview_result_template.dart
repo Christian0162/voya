@@ -132,11 +132,13 @@ class _FillerWordsCard extends StatelessWidget {
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
             children: entries
-                .map((e) => Chip(
-                      label: Text('"${e.key}"  ${e.value}'),
-                      backgroundColor: AppColors.warning.withValues(alpha: 0.1),
-                      side: BorderSide.none,
-                    ))
+                .map(
+                  (e) => Chip(
+                    label: Text('"${e.key}"  ${e.value}'),
+                    backgroundColor: AppColors.warning.withValues(alpha: 0.1),
+                    side: BorderSide.none,
+                  ),
+                )
                 .toList(),
           ),
           const SizedBox(height: AppSpacing.md),

@@ -42,10 +42,7 @@ class HomeTemplate extends StatelessWidget {
             children: [
               Text(greeting, style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Ready for your next interview?',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+              Text('Ready for your next interview?', style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: AppSpacing.xl),
               MdHomeHeroCard(onStart: onStartInterview),
               const SizedBox(height: AppSpacing.xl),

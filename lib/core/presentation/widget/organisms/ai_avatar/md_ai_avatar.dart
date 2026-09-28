@@ -57,7 +57,8 @@ class _MdAiAvatarState extends State<MdAiAvatar> {
   }
 
   void _onRiveInit(Artboard artboard) {
-    final controller = StateMachineController.fromArtboard(artboard, _stateMachineName) ??
+    final controller =
+        StateMachineController.fromArtboard(artboard, _stateMachineName) ??
         (artboard.stateMachines.isNotEmpty
             ? StateMachineController.fromArtboard(artboard, artboard.stateMachines.first.name)
             : null);
@@ -124,11 +125,7 @@ class _MdAiAvatarState extends State<MdAiAvatar> {
             SizedBox(
               width: widget.size,
               height: widget.size,
-              child: RiveAnimation.asset(
-                _assetPath,
-                fit: BoxFit.contain,
-                onInit: _onRiveInit,
-              ),
+              child: RiveAnimation.asset(_assetPath, fit: BoxFit.contain, onInit: _onRiveInit),
             ),
           ],
         ),

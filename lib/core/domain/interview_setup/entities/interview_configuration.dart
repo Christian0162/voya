@@ -48,6 +48,12 @@ class InterviewConfiguration extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [country, purpose, difficulty, durationMinutes, jobOrProgramTitle, resumeHighlights];
+  List<Object?> get props => [
+    country,
+    purpose,
+    difficulty,
+    durationMinutes,
+    jobOrProgramTitle,
+    resumeHighlights,
+  ];
 }

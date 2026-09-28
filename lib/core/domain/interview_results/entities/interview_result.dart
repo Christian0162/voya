@@ -37,16 +37,16 @@ class InterviewResult extends Equatable {
 
   @override
   List<Object?> get props => [
-        sessionId,
-        completedAt,
-        communication,
-        clarity,
-        answerQuality,
-        speakingPace,
-        consistency,
-        strengths,
-        practiceAreas,
-        questionsToPractice,
-        fillerWordCounts,
-      ];
+    sessionId,
+    completedAt,
+    communication,
+    clarity,
+    answerQuality,
+    speakingPace,
+    consistency,
+    strengths,
+    practiceAreas,
+    questionsToPractice,
+    fillerWordCounts,
+  ];
 }
