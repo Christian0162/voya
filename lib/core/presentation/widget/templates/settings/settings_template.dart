@@ -5,11 +5,19 @@ import 'package:voya/config/constant/app_constants.dart';
 import 'package:voya/config/constant/app_spacing.dart';
 import 'package:voya/core/presentation/widget/molecules/md_card.dart';
 import 'package:voya/core/presentation/widget/molecules/md_settings_tile.dart';
+import 'package:voya/core/presentation/widget/molecules/md_theme_mode_selector.dart';
 
 class SettingsTemplate extends StatelessWidget {
-  const SettingsTemplate({super.key, required this.onOpenMicrophoneSettings});
+  const SettingsTemplate({
+    super.key,
+    required this.onOpenMicrophoneSettings,
+    required this.themeMode,
+    required this.onThemeModeSelected,
+  });
 
   final VoidCallback onOpenMicrophoneSettings;
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeModeSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +28,10 @@ class SettingsTemplate extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.xl),
           children: [
             const _BrandHeader(),
+            const SizedBox(height: AppSpacing.xl),
+            const _SectionLabel('Appearance'),
+            const SizedBox(height: AppSpacing.sm),
+            MdThemeModeSelector(selected: themeMode, onSelected: onThemeModeSelected),
             const SizedBox(height: AppSpacing.xl),
             const _SectionLabel('Preferences'),
             const SizedBox(height: AppSpacing.sm),
@@ -42,8 +54,7 @@ class SettingsTemplate extends StatelessWidget {
                 icon: Icons.shield_rounded,
                 iconColor: AppColors.success,
                 title: 'Your data',
-                subtitle:
-                    'Only transcripts and scores are stored, on this device. No audio is kept.',
+                subtitle: 'Only transcripts and scores are stored, tied to your account. No audio is kept.',
                 showChevron: false,
               ),
             ),
