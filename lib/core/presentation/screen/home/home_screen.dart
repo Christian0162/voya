@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:voya/config/constant/app_colors.dart';
 import 'package:voya/core/domain/interview/entities/interview_history_entry.dart';
 import 'package:voya/core/domain/interview/repositories/interview_repository.dart';
 import 'package:voya/core/presentation/widget/molecules/md_progress_summary_card.dart';
@@ -21,10 +20,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<InterviewHistoryEntry>> _recentFuture;
 
+  // Fetched once and shared: the top 5 drive the "Recent Practice" tiles,
+  // the full 50 drive the honest totals/streak in ProgressStats — fetching
+  // more than the tile list needs (rather than a second, smaller call) keeps
+  // both numbers accurate without a new repository method.
+  static const _fetchLimit = 50;
+  static const _recentTileCount = 5;
+
   @override
   void initState() {
     super.initState();
-    _recentFuture = widget.repository.getRecentSessions(limit: 5);
+    _recentFuture = widget.repository.getRecentSessions(limit: _fetchLimit);
   }
 
   String _greeting() {
@@ -35,33 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _refresh() async {
-    setState(() => _recentFuture = widget.repository.getRecentSessions(limit: 5));
+    setState(() => _recentFuture = widget.repository.getRecentSessions(limit: _fetchLimit));
     await _recentFuture;
-  }
-
-  List<ProgressMetric> _progressMetrics(List<InterviewHistoryEntry> entries) {
-    final scored = entries.where((e) => e.overallScore != null).map((e) => e.overallScore!);
-    final avgScore = scored.isEmpty ? 0.7 : scored.reduce((a, b) => a + b) / scored.length;
-    return [
-      ProgressMetric(
-        label: 'Speaking',
-        value: avgScore,
-        icon: Icons.mic_rounded,
-        color: AppColors.primary,
-      ),
-      ProgressMetric(
-        label: 'Confidence',
-        value: (avgScore - 0.05).clamp(0.0, 1.0),
-        icon: Icons.bolt_rounded,
-        color: AppColors.warning,
-      ),
-      ProgressMetric(
-        label: 'Clarity',
-        value: (avgScore + 0.05).clamp(0.0, 1.0),
-        icon: Icons.chat_bubble_rounded,
-        color: AppColors.success,
-      ),
-    ];
   }
 
   @override
@@ -73,10 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
         return HomeTemplate(
           greeting: _greeting(),
           isLoadingRecent: snapshot.connectionState != ConnectionState.done,
-          recentEntries: entries,
-          progressMetrics: _progressMetrics(entries),
+          recentEntries: entries.take(_recentTileCount).toList(),
+          stats: ProgressStats.fromEntries(entries),
           onStartInterview: () => context.push('/interview/setup'),
           onRefresh: _refresh,
+          onAnswerCoachPressed: () => context.push('/answer-guidance'),
         );
       },
     );

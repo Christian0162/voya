@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:voya/config/constant/app_colors.dart';
 import 'package:voya/config/constant/app_theme.dart';
 import 'package:voya/core/domain/interview/entities/interview_history_entry.dart';
 import 'package:voya/core/domain/interview_setup/entities/interview_difficulty.dart';
@@ -36,28 +35,10 @@ class HomeTemplatePreview extends StatelessWidget {
             overallScore: 0.82,
           ),
         ],
-        progressMetrics: const [
-          ProgressMetric(
-            label: 'Speaking',
-            value: 0.82,
-            icon: Icons.mic_rounded,
-            color: AppColors.primary,
-          ),
-          ProgressMetric(
-            label: 'Confidence',
-            value: 0.76,
-            icon: Icons.bolt_rounded,
-            color: AppColors.warning,
-          ),
-          ProgressMetric(
-            label: 'Clarity',
-            value: 0.88,
-            icon: Icons.chat_bubble_rounded,
-            color: AppColors.success,
-          ),
-        ],
+        stats: const ProgressStats(totalPractices: 6, averageScore: 0.82, practicedThisWeek: 2),
         onStartInterview: () {},
         onRefresh: () async {},
+        onAnswerCoachPressed: () {},
       ),
     );
   }

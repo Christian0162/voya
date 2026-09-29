@@ -4,8 +4,10 @@ import 'package:voya/config/constant/app_colors.dart';
 import 'package:voya/config/constant/app_constants.dart';
 import 'package:voya/config/constant/app_spacing.dart';
 import 'package:voya/core/domain/interview/entities/interview_history_entry.dart';
+import 'package:voya/core/presentation/widget/atoms/md_primary_button.dart';
 import 'package:voya/core/presentation/widget/molecules/md_empty_state.dart';
 import 'package:voya/core/presentation/widget/molecules/md_home_hero_card.dart';
+import 'package:voya/core/presentation/widget/molecules/md_mascot_face.dart';
 import 'package:voya/core/presentation/widget/molecules/md_progress_summary_card.dart';
 import 'package:voya/core/presentation/widget/molecules/md_recent_practice_tile.dart';
 
@@ -18,22 +20,33 @@ class HomeTemplate extends StatelessWidget {
     required this.greeting,
     required this.isLoadingRecent,
     required this.recentEntries,
-    required this.progressMetrics,
+    required this.stats,
     required this.onStartInterview,
     required this.onRefresh,
+    required this.onAnswerCoachPressed,
   });
 
   final String greeting;
   final bool isLoadingRecent;
   final List<InterviewHistoryEntry> recentEntries;
-  final List<ProgressMetric> progressMetrics;
+  final ProgressStats stats;
   final VoidCallback onStartInterview;
   final Future<void> Function() onRefresh;
+  final VoidCallback onAnswerCoachPressed;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(AppConstants.appName)),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const MdMascotFace(size: 28),
+            const SizedBox(width: AppSpacing.sm),
+            Text(AppConstants.appName),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: onRefresh,
@@ -45,8 +58,15 @@ class HomeTemplate extends StatelessWidget {
               Text('Ready for your next interview?', style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: AppSpacing.xl),
               MdHomeHeroCard(onStart: onStartInterview),
+              const SizedBox(height: AppSpacing.md),
+              MdPrimaryButton(
+                label: 'Answer Coach',
+                icon: Icons.lightbulb_outline_rounded,
+                variant: MdButtonVariant.secondary,
+                onPressed: onAnswerCoachPressed,
+              ),
               const SizedBox(height: AppSpacing.xl),
-              MdProgressSummaryCard(metrics: progressMetrics),
+              MdProgressSummaryCard(stats: stats),
               const SizedBox(height: AppSpacing.xl),
               Text('Recent Practice', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: AppSpacing.md),

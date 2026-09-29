@@ -4,6 +4,7 @@ import 'package:voya/config/constant/app_colors.dart';
 import 'package:voya/config/constant/app_spacing.dart';
 import 'package:voya/core/domain/interview/entities/interview_history_entry.dart';
 import 'package:voya/core/presentation/widget/molecules/md_empty_state.dart';
+import 'package:voya/core/presentation/widget/molecules/md_progress_summary_card.dart';
 import 'package:voya/core/presentation/widget/molecules/md_recent_practice_tile.dart';
 
 class HistoryTemplate extends StatelessWidget {
@@ -11,11 +12,13 @@ class HistoryTemplate extends StatelessWidget {
     super.key,
     required this.isLoading,
     required this.entries,
+    required this.stats,
     required this.onStartInterview,
   });
 
   final bool isLoading;
   final List<InterviewHistoryEntry> entries;
+  final ProgressStats stats;
   final VoidCallback onStartInterview;
 
   @override
@@ -42,11 +45,17 @@ class HistoryTemplate extends StatelessWidget {
         ),
       );
     }
+    // The progress summary + list are both driven by the same fetched
+    // entries (see HistoryScreen) — this turns History from a bare log into
+    // "your progress", answering the request to see progress alongside history.
     return ListView.separated(
       padding: const EdgeInsets.all(AppSpacing.xl),
-      itemCount: entries.length,
+      itemCount: entries.length + 1,
       separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
-      itemBuilder: (_, index) => MdRecentPracticeTile(entry: entries[index]),
+      itemBuilder: (_, index) {
+        if (index == 0) return MdProgressSummaryCard(stats: stats);
+        return MdRecentPracticeTile(entry: entries[index - 1]);
+      },
     );
   }
 }

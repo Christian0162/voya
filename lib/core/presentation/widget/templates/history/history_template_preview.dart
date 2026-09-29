@@ -4,6 +4,7 @@ import 'package:voya/config/constant/app_theme.dart';
 import 'package:voya/core/domain/interview/entities/interview_history_entry.dart';
 import 'package:voya/core/domain/interview_setup/entities/interview_difficulty.dart';
 import 'package:voya/core/domain/interview_setup/entities/interview_purpose.dart';
+import 'package:voya/core/presentation/widget/molecules/md_progress_summary_card.dart';
 
 import 'history_template.dart';
 
@@ -31,6 +32,7 @@ class HistoryTemplatePreview extends StatelessWidget {
             overallScore: 0.74,
           ),
         ],
+        stats: const ProgressStats(totalPractices: 1, averageScore: 0.74, practicedThisWeek: 1),
         onStartInterview: () {},
       ),
     );

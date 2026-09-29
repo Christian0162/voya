@@ -30,6 +30,19 @@ class MdCard extends StatelessWidget {
           color: selected ? theme.colorScheme.primary : (theme.dividerColor),
           width: selected ? 1.5 : 1,
         ),
+        // A soft, low-opacity shadow rather than a flat bordered box — gives
+        // every card a touch of the "chunky, tactile" claymorphism cue
+        // without going full 3D/thick-border, which would clash with the
+        // rest of the app's calmer surfaces.
+        boxShadow: [
+          BoxShadow(
+            color: (selected ? theme.colorScheme.primary : Colors.black).withValues(
+              alpha: selected ? 0.18 : 0.10,
+            ),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       // A Material between this colored box and `child` so any descendant
       // ListTile/InkWell paints its ink splashes on top of the card's own

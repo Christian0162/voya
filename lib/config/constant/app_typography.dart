@@ -35,6 +35,12 @@ class AppTypography {
         color: primaryText,
         height: 1.3,
       ),
+      headlineSmall: base.headlineSmall?.copyWith(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: primaryText,
+        height: 1.3,
+      ),
       titleLarge: base.titleLarge?.copyWith(
         fontSize: 18,
         fontWeight: FontWeight.w600,
@@ -51,8 +57,13 @@ class AppTypography {
         color: primaryText,
         height: 1.5,
       ),
+      // bodyMedium/bodySmall/labelMedium are used as the primary readable
+      // text almost everywhere (card descriptions, tile subtitles, settings
+      // rows) — bumped a notch above their Material defaults (14/12/12) so
+      // they clear the ~16px-body / no-sub-13px-for-content guidance that
+      // came back from testers finding the app hard to read.
       bodyMedium: base.bodyMedium?.copyWith(
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: FontWeight.w400,
         color: secondaryText,
         height: 1.5,
@@ -63,12 +74,12 @@ class AppTypography {
         color: primaryText,
       ),
       labelMedium: base.labelMedium?.copyWith(
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: FontWeight.w500,
         color: secondaryText,
       ),
       bodySmall: base.bodySmall?.copyWith(
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: FontWeight.w400,
         color: secondaryText,
         height: 1.4,

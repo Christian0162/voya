@@ -33,12 +33,32 @@ class MdPurposeSelector extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(purpose.label, style: Theme.of(context).textTheme.titleMedium),
-                    Text(purpose.description, style: Theme.of(context).textTheme.bodySmall),
+                    Text(
+                      purpose.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Text(
+                      purpose.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ],
                 ),
               ),
-              if (isSelected) const Icon(Icons.check_circle_rounded, color: AppColors.primary),
+              const SizedBox(width: AppSpacing.sm),
+              // Always present (selected vs. unselected icon swapped, never
+              // added/removed) so the trailing icon's width is reserved up
+              // front — otherwise the Expanded label above regains/loses
+              // that width the instant you tap a card, reflowing/wrapping
+              // text that fit fine a moment ago. Matches the same pattern
+              // already used in MdDifficultySelector.
+              Icon(
+                isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                color: isSelected ? AppColors.primary : Theme.of(context).dividerColor,
+              ),
             ],
           ),
         );
