@@ -20,7 +20,8 @@ import 'interview_state.dart';
 import 'interview_status.dart';
 
 /// Orchestrates the full voice conversation loop described in the spec:
-/// AI speaks -> avatar talks -> AI finishes -> app listens -> user speaks ->
+/// AI speaks -> avatar talks -> AI finishes -> app waits for the user to
+/// press and hold the mic (push-to-talk) -> user speaks -> mic released ->
 /// speech processed -> AI analyzes -> follow-up or next question -> repeat.
 ///
 /// The bloc never touches `speech_to_text`/`flutter_tts` directly — it only
@@ -51,6 +52,8 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
     on<AmplitudeChanged>(_onAmplitudeChanged);
     on<SpeechErrorOccurred>(_onSpeechError);
     on<MicrophonePermissionDenied>(_onMicPermissionDenied);
+    on<MicPressStarted>(_onMicPressStarted);
+    on<MicPressStopped>(_onMicPressStopped);
     on<RetryListeningRequested>(_onRetryListening);
     on<EndInterviewRequested>(_onEndInterview);
     on<TimerTicked>(_onTimerTicked);
@@ -102,8 +105,8 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
       _questionCounter = 1;
       emit(state.copyWith(currentQuestion: question, clearFailure: true));
       await _speak(question, emit);
-    } catch (_) {
-      emit(state.copyWith(status: InterviewStatus.error, failure: const AiProviderFailure()));
+    } catch (e) {
+      emit(state.copyWith(status: InterviewStatus.error, failure: AiProviderFailure(e.toString())));
     }
   }
 
@@ -119,11 +122,18 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
   }
 
   Future<void> _onAiFinishedSpeaking(AiFinishedSpeaking event, Emitter<InterviewState> emit) async {
-    await _startListening(emit);
+    // Push-to-talk: the mic stays idle, waiting for the user to press and
+    // hold it, rather than auto-starting the recognizer.
+    emit(state.copyWith(status: InterviewStatus.listening, amplitude: 0, liveTranscript: ''));
   }
 
-  Future<void> _startListening(Emitter<InterviewState> emit) async {
-    emit(state.copyWith(status: InterviewStatus.listening, amplitude: 0, liveTranscript: ''));
+  Future<void> _onMicPressStarted(MicPressStarted event, Emitter<InterviewState> emit) async {
+    if (state.status != InterviewStatus.listening) return;
+    await _beginRecording(emit);
+  }
+
+  Future<void> _beginRecording(Emitter<InterviewState> emit) async {
+    emit(state.copyWith(status: InterviewStatus.userSpeaking, amplitude: 0, liveTranscript: ''));
     _listenStartedAt = DateTime.now();
     await _stt.startListening(
       onResult: (transcript, isFinal) => add(UserSpeechUpdated(transcript, isFinal)),
@@ -136,13 +146,29 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
     );
   }
 
+  Future<void> _onMicPressStopped(MicPressStopped event, Emitter<InterviewState> emit) async {
+    if (state.status != InterviewStatus.userSpeaking) return;
+    await _stt.stopListening();
+    await _finalizeAnswer(state.liveTranscript, emit);
+  }
+
   Future<void> _onUserSpeechUpdated(UserSpeechUpdated event, Emitter<InterviewState> emit) async {
     if (!event.isFinal) {
-      emit(state.copyWith(status: InterviewStatus.userSpeaking, liveTranscript: event.transcript));
+      if (state.status != InterviewStatus.userSpeaking) return;
+      emit(state.copyWith(liveTranscript: event.transcript));
       return;
     }
 
+    // The recognizer can still deliver a final result after the user has
+    // already released the mic (which finalizes the answer itself) — ignore
+    // it so the answer isn't recorded twice.
+    if (state.status != InterviewStatus.userSpeaking) return;
+
     await _stt.stopListening();
+    await _finalizeAnswer(event.transcript, emit);
+  }
+
+  Future<void> _finalizeAnswer(String transcript, Emitter<InterviewState> emit) async {
     _consecutiveNoMatchCount = 0;
     final duration = _listenStartedAt == null
         ? Duration.zero
@@ -153,7 +179,7 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
 
     final answer = AnswerBuilder.build(
       questionId: question.id,
-      transcript: event.transcript,
+      transcript: transcript,
       spokenDuration: duration,
     );
 
@@ -167,7 +193,7 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
       ),
     );
 
-    unawaited(_processAnswer(updatedTurns.last, updatedTurns, emit));
+    await _processAnswer(updatedTurns.last, updatedTurns, emit);
   }
 
   Future<void> _processAnswer(
@@ -206,8 +232,8 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
           : await _ai.generateNextQuestion(configuration: configuration, history: history);
 
       await _speak(next, emit);
-    } catch (_) {
-      emit(state.copyWith(status: InterviewStatus.error, failure: const AiProviderFailure()));
+    } catch (e) {
+      emit(state.copyWith(status: InterviewStatus.error, failure: AiProviderFailure(e.toString())));
     }
   }
 
@@ -246,17 +272,16 @@ class InterviewBloc extends Bloc<InterviewEvent, InterviewState> {
   }
 
   Future<void> _onSpeechError(SpeechErrorOccurred event, Emitter<InterviewState> emit) async {
-    final isListeningPhase =
-        state.status == InterviewStatus.listening || state.status == InterviewStatus.userSpeaking;
+    final isRecording = state.status == InterviewStatus.userSpeaking;
     final isRecoverable = _recoverableSpeechErrors.contains(event.message);
 
-    if (isListeningPhase && isRecoverable && _consecutiveNoMatchCount < _maxAutoRetries) {
-      // The user just didn't say anything (or a pause ran past the
-      // recognizer's timeout) — not a real failure, so quietly listen again
-      // instead of dropping the whole interview into an error screen.
+    if (isRecording && isRecoverable && _consecutiveNoMatchCount < _maxAutoRetries) {
+      // The recognizer paused or lost track mid-hold — not a real failure,
+      // so quietly keep recording instead of dropping the whole interview
+      // into an error screen while the user is still holding the mic.
       _consecutiveNoMatchCount += 1;
       await _stt.stopListening();
-      await _startListening(emit);
+      await _beginRecording(emit);
       return;
     }
 

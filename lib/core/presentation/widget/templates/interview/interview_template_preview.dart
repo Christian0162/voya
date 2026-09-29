@@ -36,6 +36,9 @@ class InterviewTemplatePreview extends StatelessWidget {
         onEndInterviewPressed: () {},
         onShowTranscript: () {},
         onRetryListening: () {},
+        onMicPressStart: () {},
+        onMicPressEnd: () {},
+        onNeedHelpPressed: () {},
       ),
     );
   }

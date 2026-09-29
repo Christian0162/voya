@@ -4,10 +4,12 @@ import 'package:voya/config/constant/app_colors.dart';
 import 'package:voya/config/constant/app_spacing.dart';
 import 'package:voya/core/presentation/bloc/interview/interview_state.dart';
 import 'package:voya/core/presentation/bloc/interview/interview_status.dart';
+import 'package:voya/core/presentation/widget/molecules/md_country_hat.dart';
 import 'package:voya/core/presentation/widget/molecules/md_error_state.dart';
 import 'package:voya/core/presentation/widget/molecules/md_voice_waveform.dart';
 import 'package:voya/core/presentation/widget/organisms/ai_avatar/ai_avatar_controller.dart';
 import 'package:voya/core/presentation/widget/organisms/ai_avatar/md_ai_avatar.dart';
+import 'package:voya/core/presentation/widget/organisms/md_push_to_talk_mic.dart';
 
 /// Pure layout for the most important screen in the product (spec section
 /// 15/41). All conversation state comes from [InterviewBloc] via the Screen;
@@ -22,6 +24,9 @@ class InterviewTemplate extends StatelessWidget {
     required this.onEndInterviewPressed,
     required this.onShowTranscript,
     required this.onRetryListening,
+    required this.onMicPressStart,
+    required this.onMicPressEnd,
+    required this.onNeedHelpPressed,
   });
 
   final InterviewState state;
@@ -30,6 +35,25 @@ class InterviewTemplate extends StatelessWidget {
   final VoidCallback onEndInterviewPressed;
   final VoidCallback onShowTranscript;
   final VoidCallback onRetryListening;
+  final VoidCallback onMicPressStart;
+  final VoidCallback onMicPressEnd;
+  final VoidCallback onNeedHelpPressed;
+
+  static const _avatarSize = 200.0;
+  static const _hatSize = 80.0;
+
+  /// MdAiAvatar centers its `_avatarSize x _avatarSize` character art inside
+  /// a larger `_avatarSize * 1.5` bounding box (extra room for the pulsing
+  /// listen ring), so the hat has to be anchored to that *inner* art box's
+  /// top, not the outer one — anchoring to the outer box (as before) left it
+  /// floating well above the actual head. `_headOverlap` is a best-effort
+  /// estimate of how far down the rig's head starts within its own art box
+  /// — nudge it if the hat looks off once seen against the real rig on a
+  /// device (this repo can't render the `.riv` file to check pixel-exact
+  /// placement).
+  static const _headOverlap = _avatarSize * 0.50;
+  static double get _innerArtTop => (_avatarSize * 1.5 - _avatarSize) / 2;
+  static double get _hatTopOffset => _innerArtTop + _headOverlap - _hatSize * 0.85;
 
   @override
   Widget build(BuildContext context) {
@@ -47,20 +71,57 @@ class InterviewTemplate extends StatelessWidget {
                     onShowTranscript: onShowTranscript,
                   ),
                   Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          MdAiAvatar(controller: avatarController, size: 200),
-                          const SizedBox(height: AppSpacing.xxl),
-                          _QuestionOrTranscript(state: state),
-                          const SizedBox(height: AppSpacing.xl),
-                          _StatusIndicator(state: state),
-                        ],
-                      ),
+                    // A LayoutBuilder + scroll view instead of a bare Center:
+                    // this content's height (avatar + question text + status
+                    // line) is fixed, but the space available for it isn't —
+                    // a shorter screen, a longer question that wraps to more
+                    // lines, or system font scaling can all push the total
+                    // past what fits, which a bare Center silently overflows
+                    // (the "overflowed by N pixels" banner). Centered when it
+                    // fits, scrollable instead of clipped/erroring when it
+                    // doesn't.
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Stack(
+                                    alignment: Alignment.topCenter,
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      MdAiAvatar(controller: avatarController, size: _avatarSize),
+                                      if (state.configuration != null)
+                                        Positioned(
+                                          top: _hatTopOffset,
+                                          child: MdCountryHat(
+                                            country: state.configuration!.country,
+                                            size: _hatSize,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: AppSpacing.xxl),
+                                  _QuestionOrTranscript(state: state),
+                                  const SizedBox(height: AppSpacing.xl),
+                                  _StatusIndicator(state: state),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  _BottomBar(state: state),
+                  _BottomBar(
+                    state: state,
+                    onMicPressStart: onMicPressStart,
+                    onMicPressEnd: onMicPressEnd,
+                    onNeedHelpPressed: onNeedHelpPressed,
+                  ),
                 ],
               ),
       ),
@@ -160,12 +221,23 @@ class _StatusIndicator extends StatelessWidget {
   const _StatusIndicator({required this.state});
   final InterviewState state;
 
+  static const _loadingStatuses = {
+    InterviewStatus.preparing,
+    InterviewStatus.aiThinking,
+    InterviewStatus.processingAnswer,
+    InterviewStatus.generatingFeedback,
+  };
+
   @override
   Widget build(BuildContext context) {
+    // Only animate while audio is actually happening (AI speaking or the
+    // user actively recording) — not while idle and waiting for a press.
     final showWaveform =
-        state.status == InterviewStatus.aiSpeaking ||
-        state.status == InterviewStatus.listening ||
-        state.status == InterviewStatus.userSpeaking;
+        state.status == InterviewStatus.aiSpeaking || state.status == InterviewStatus.userSpeaking;
+    // Everything else where the app is silently waiting on the AI (starting
+    // up, thinking, scoring) gets a spinner instead of just static text —
+    // otherwise those waits read as the screen being stuck rather than busy.
+    final showSpinner = _loadingStatuses.contains(state.status);
 
     return Column(
       children: [
@@ -175,6 +247,12 @@ class _StatusIndicator extends StatelessWidget {
             color: state.status == InterviewStatus.aiSpeaking
                 ? AppColors.speaking
                 : AppColors.listening,
+          ),
+        if (showSpinner)
+          const SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.primaryLight),
           ),
         const SizedBox(height: AppSpacing.sm),
         Text(_labelFor(state.status), style: const TextStyle(color: Colors.white54, fontSize: 13)),
@@ -198,7 +276,7 @@ class _StatusIndicator extends StatelessWidget {
       case InterviewStatus.aiSpeaking:
         return 'AI is speaking';
       case InterviewStatus.listening:
-        return 'Speak naturally';
+        return 'Hold the mic to answer';
       case InterviewStatus.userSpeaking:
         return 'Listening…';
       case InterviewStatus.processingAnswer:
@@ -212,29 +290,48 @@ class _StatusIndicator extends StatelessWidget {
 }
 
 class _BottomBar extends StatelessWidget {
-  const _BottomBar({required this.state});
+  const _BottomBar({
+    required this.state,
+    required this.onMicPressStart,
+    required this.onMicPressEnd,
+    required this.onNeedHelpPressed,
+  });
+
   final InterviewState state;
+  final VoidCallback onMicPressStart;
+  final VoidCallback onMicPressEnd;
+  final VoidCallback onNeedHelpPressed;
 
   @override
   Widget build(BuildContext context) {
-    final isListening =
-        state.status == InterviewStatus.listening || state.status == InterviewStatus.userSpeaking;
+    // Ready to record (waiting for a press) or actively recording (pressed).
+    final isReady = state.status == InterviewStatus.listening;
+    final isRecording = state.status == InterviewStatus.userSpeaking;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xxl, top: AppSpacing.md),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isListening ? AppColors.listening.withValues(alpha: 0.15) : Colors.white10,
-        ),
-        child: Icon(
-          isListening ? Icons.mic_rounded : Icons.mic_off_rounded,
-          color: isListening ? AppColors.listening : Colors.white38,
-          size: 26,
-        ),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md, top: AppSpacing.md),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Only offered while the mic is idle waiting for a press (spec
+          // section 4, Mode B) — never mid-answer, and never auto-shown.
+          if (isReady)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: TextButton.icon(
+                onPressed: onNeedHelpPressed,
+                icon: const Icon(Icons.lightbulb_outline_rounded, size: 18, color: Colors.white70),
+                label: const Text('I need help answering', style: TextStyle(color: Colors.white70)),
+              ),
+            ),
+          MdPushToTalkMic(
+            isReady: isReady,
+            isRecording: isRecording,
+            onPressStart: onMicPressStart,
+            onPressEnd: onMicPressEnd,
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
       ),
     );
   }

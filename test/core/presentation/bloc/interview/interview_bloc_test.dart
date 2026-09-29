@@ -55,6 +55,7 @@ void main() {
     registerFallbackValue(configuration);
     registerFallbackValue(<InterviewTurn>[]);
     registerFallbackValue(openingQuestion);
+    registerFallbackValue(const InterviewTurn(question: openingQuestion));
     registerFallbackValue(
       InterviewSession(id: 'fallback', configuration: configuration, startedAt: DateTime(2026)),
     );
@@ -208,13 +209,17 @@ void main() {
     act: (bloc) async {
       bloc.add(StartInterviewRequested(configuration));
       await Future<void>.delayed(const Duration(milliseconds: 50));
+      bloc.add(const MicPressStarted());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
       bloc.add(const SpeechErrorOccurred('error_no_match'));
     },
     wait: const Duration(milliseconds: 50),
     verify: (bloc) {
-      expect(bloc.state.status, InterviewStatus.listening);
+      // Still recording — the mic quietly restarted rather than bouncing
+      // back to idle or failing.
+      expect(bloc.state.status, InterviewStatus.userSpeaking);
       expect(bloc.state.failure, isNull);
-      // Once for the initial question, once for the retry after the error.
+      // Once for the initial hold, once for the retry after the error.
       verify(
         () => stt.startListening(
           onResult: any(named: 'onResult'),
@@ -243,6 +248,8 @@ void main() {
     act: (bloc) async {
       bloc.add(StartInterviewRequested(configuration));
       await Future<void>.delayed(const Duration(milliseconds: 50));
+      bloc.add(const MicPressStarted());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
       bloc.add(const SpeechErrorOccurred('error_no_match'));
       await Future<void>.delayed(const Duration(milliseconds: 20));
       bloc.add(const SpeechErrorOccurred('error_no_match'));
@@ -253,6 +260,116 @@ void main() {
     verify: (bloc) {
       expect(bloc.state.status, InterviewStatus.error);
       expect(bloc.state.failure, isA<SpeechRecognitionFailure>());
+    },
+  );
+
+  blocTest<InterviewBloc, dynamic>(
+    'records and submits an answer when the mic is pressed and released',
+    setUp: () {
+      when(() => permissions.requestMicrophone()).thenAnswer((_) async => true);
+      when(() => ai.generateOpeningQuestion(any())).thenAnswer((_) async => openingQuestion);
+      when(() => tts.speak(any(), onAmplitude: any(named: 'onAmplitude'))).thenAnswer((_) async {});
+      when(
+        () => stt.startListening(
+          onResult: any(named: 'onResult'),
+          onSoundLevelChange: any(named: 'onSoundLevelChange'),
+          onError: any(named: 'onError'),
+        ),
+      ).thenAnswer((_) async {});
+      when(
+        () => ai.analyzeAnswer(
+          configuration: any(named: 'configuration'),
+          history: any(named: 'history'),
+          currentTurn: any(named: 'currentTurn'),
+        ),
+      ).thenAnswer(
+        (_) async =>
+            const AnswerAnalysis(isVague: false, isInconsistent: false, followUpQuestion: null),
+      );
+      when(
+        () => ai.generateNextQuestion(
+          configuration: any(named: 'configuration'),
+          history: any(named: 'history'),
+        ),
+      ).thenAnswer(
+        (_) async => const InterviewQuestion(
+          id: 'q1',
+          text: 'What did you like about your last role?',
+          kind: QuestionKind.followUp,
+          order: 1,
+        ),
+      );
+    },
+    build: buildBloc,
+    act: (bloc) async {
+      bloc.add(StartInterviewRequested(configuration));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      bloc.add(const MicPressStarted());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      bloc.add(const UserSpeechUpdated('I led a small team', false));
+      bloc.add(const MicPressStopped());
+    },
+    wait: const Duration(milliseconds: 50),
+    verify: (bloc) {
+      expect(bloc.state.turns, hasLength(1));
+      expect(bloc.state.turns.first.answer?.transcript, 'I led a small team');
+      verify(() => stt.stopListening()).called(greaterThanOrEqualTo(1));
+    },
+  );
+
+  blocTest<InterviewBloc, dynamic>(
+    "ignores a late final STT result after the mic was already released",
+    setUp: () {
+      when(() => permissions.requestMicrophone()).thenAnswer((_) async => true);
+      when(() => ai.generateOpeningQuestion(any())).thenAnswer((_) async => openingQuestion);
+      when(() => tts.speak(any(), onAmplitude: any(named: 'onAmplitude'))).thenAnswer((_) async {});
+      when(
+        () => stt.startListening(
+          onResult: any(named: 'onResult'),
+          onSoundLevelChange: any(named: 'onSoundLevelChange'),
+          onError: any(named: 'onError'),
+        ),
+      ).thenAnswer((_) async {});
+      when(
+        () => ai.analyzeAnswer(
+          configuration: any(named: 'configuration'),
+          history: any(named: 'history'),
+          currentTurn: any(named: 'currentTurn'),
+        ),
+      ).thenAnswer(
+        (_) async =>
+            const AnswerAnalysis(isVague: false, isInconsistent: false, followUpQuestion: null),
+      );
+      when(
+        () => ai.generateNextQuestion(
+          configuration: any(named: 'configuration'),
+          history: any(named: 'history'),
+        ),
+      ).thenAnswer(
+        (_) async => const InterviewQuestion(
+          id: 'q1',
+          text: 'What did you like about your last role?',
+          kind: QuestionKind.followUp,
+          order: 1,
+        ),
+      );
+    },
+    build: buildBloc,
+    act: (bloc) async {
+      bloc.add(StartInterviewRequested(configuration));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      bloc.add(const MicPressStarted());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      bloc.add(const UserSpeechUpdated('I led a small team', false));
+      bloc.add(const MicPressStopped());
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      // A late final result the recognizer delivers after release should be
+      // ignored, not recorded as a second turn.
+      bloc.add(const UserSpeechUpdated('I led a small team', true));
+    },
+    wait: const Duration(milliseconds: 50),
+    verify: (bloc) {
+      expect(bloc.state.turns, hasLength(1));
     },
   );
 

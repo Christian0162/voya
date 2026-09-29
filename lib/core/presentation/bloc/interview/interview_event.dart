@@ -53,6 +53,17 @@ class MicrophonePermissionDenied extends InterviewEvent {
   const MicrophonePermissionDenied();
 }
 
+/// Fired when the user presses and holds the mic button to start recording
+/// their answer (push-to-talk).
+class MicPressStarted extends InterviewEvent {
+  const MicPressStarted();
+}
+
+/// Fired when the user releases the mic button, ending their answer.
+class MicPressStopped extends InterviewEvent {
+  const MicPressStopped();
+}
+
 class RetryListeningRequested extends InterviewEvent {
   const RetryListeningRequested();
 }

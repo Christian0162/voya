@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:voya/config/constant/app_colors.dart';
+import 'package:voya/core/domain/answer_guidance/entities/guidance_category.dart';
+import 'package:voya/core/domain/answer_guidance/entities/guidance_question.dart';
 import 'package:voya/core/presentation/bloc/interview/interview_bloc.dart';
 import 'package:voya/core/presentation/bloc/interview/interview_event.dart';
 import 'package:voya/core/presentation/bloc/interview/interview_state.dart';
@@ -14,8 +16,8 @@ import 'package:voya/core/presentation/widget/organisms/md_interview_transcript_
 import 'package:voya/core/presentation/widget/templates/interview/interview_template.dart';
 
 /// The most important screen in the product (spec section 15/41): the AI
-/// speaks, the avatar animates, then the app listens — the user should
-/// rarely need to touch the screen at all during a healthy conversation.
+/// speaks, the avatar animates, then the user presses and holds the mic
+/// (push-to-talk) to answer.
 ///
 /// Logic only: watches [InterviewBloc], drives the avatar controller,
 /// navigates on completion, and owns the dialog/sheet interactions the
@@ -78,6 +80,23 @@ class _InterviewScreenState extends State<InterviewScreen> {
     );
   }
 
+  void _showHelp(BuildContext context, InterviewState state) {
+    final question = state.currentQuestion;
+    if (question == null) return;
+    // Mode B (spec section 4): the mic is idle here (AI already finished
+    // speaking, user hasn't pressed to answer yet) so this is a safe pause
+    // point — no InterviewBloc state needs to change. Popping this route
+    // returns to the interview exactly where it left off.
+    context.push(
+      '/answer-guidance/guide',
+      extra: GuidanceQuestion(
+        id: question.id,
+        text: question.text,
+        category: GuidanceCategory.general,
+      ),
+    );
+  }
+
   void _showTranscript(BuildContext context, InterviewState state) {
     showModalBottomSheet(
       context: context,
@@ -115,8 +134,11 @@ class _InterviewScreenState extends State<InterviewScreen> {
           hasTranscript: state.turns.isNotEmpty,
           onEndInterviewPressed: () => _confirmEnd(context),
           onShowTranscript: () => _showTranscript(context, state),
+          onNeedHelpPressed: () => _showHelp(context, state),
           onRetryListening: () =>
               context.read<InterviewBloc>().add(const RetryListeningRequested()),
+          onMicPressStart: () => context.read<InterviewBloc>().add(const MicPressStarted()),
+          onMicPressEnd: () => context.read<InterviewBloc>().add(const MicPressStopped()),
         );
       },
     );
