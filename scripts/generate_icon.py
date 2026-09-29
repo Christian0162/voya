@@ -1,14 +1,15 @@
 """
 Generates the Voya app icon.
 
-v2 design: rather than a generic microphone-in-a-square (which reads as
-"any voice utility app"), the icon now mirrors the in-app AI avatar — a
-friendly rounded face — flanked by small warm-accent soundwave bars, so it
-reads as "an AI is talking to you" and ties directly to the character users
-meet inside the app (the same logic behind Duolingo's owl: a personality
-users recognize, not just a utility glyph). A soft drop shadow gives the
-badge a bit of claymorphism-style depth/pop for a store listing, while
-staying a single bold silhouette so it's still legible at 16px.
+v3 design: bigger eyes and blush cheeks (matching the in-app
+`MdMascotFace`/setup-wizard mascot's kawaii proportions) so the launcher
+icon and the character the user meets inside the app read as the exact same
+mascot, not just a similar shape. Flanked by small warm-accent soundwave
+bars so it still reads as "an AI is talking to you" (the same logic behind
+Duolingo's owl: a personality users recognize, not just a utility glyph). A
+soft drop shadow gives the badge a bit of claymorphism-style depth/pop for a
+store listing, while staying a single bold silhouette so it's still legible
+at 16px.
 
 Outputs:
   assets/icon/app_icon.png             1024x1024, opaque background (master icon)
@@ -22,6 +23,7 @@ SIZE = 1024
 PRIMARY = (79, 70, 229)   # #4F46E5 indigo
 ACCENT = (124, 58, 237)   # #7C3AED violet
 WAVE_ACCENT = (251, 191, 36)  # #FBBF24 warm amber — the "pop" color
+BLUSH = (251, 113, 133)  # #FB7185 rose — cheeks only, matches MdMascotFace
 
 
 def lerp(a, b, t):
@@ -55,21 +57,31 @@ def draw_face(draw, cx, cy, scale, color):
 
 def draw_face_features(draw, cx, cy, scale, color, is_foreground=False):
     radius = scale * 0.5
-    eye_y = cy - radius * 0.12
-    eye_spacing = radius * 0.38
-    eye_w = radius * 0.16
-    eye_h = radius * 0.22
-    for dx in (-eye_spacing, eye_spacing):
-        ex = cx + dx
-        draw.rounded_rectangle(
-            [ex - eye_w / 2, eye_y - eye_h / 2, ex + eye_w / 2, eye_y + eye_h / 2],
-            radius=eye_w / 2,
-            fill=color,
+
+    # Blush first, so the (larger) eyes and mouth drawn after sit on top and
+    # stay crisp — matches MdMascotFace's kawaii cues: oversized eyes + rosy
+    # cheeks read as "cute" far more than a smaller, more realistic pair.
+    blush_y = cy + radius * 0.3
+    blush_spacing = radius * 0.62
+    blush_w = radius * 0.22
+    blush_h = radius * 0.13
+    for dx in (-blush_spacing, blush_spacing):
+        bx = cx + dx
+        draw.ellipse(
+            [bx - blush_w / 2, blush_y - blush_h / 2, bx + blush_w / 2, blush_y + blush_h / 2],
+            fill=BLUSH,
         )
 
-    mouth_y = cy + radius * 0.32
-    mouth_w = radius * 0.5
-    stroke = max(2, int(radius * 0.07))
+    eye_y = cy - radius * 0.1
+    eye_spacing = radius * 0.36
+    eye_r = radius * 0.15
+    for dx in (-eye_spacing, eye_spacing):
+        ex = cx + dx
+        draw.ellipse([ex - eye_r, eye_y - eye_r, ex + eye_r, eye_y + eye_r], fill=color)
+
+    mouth_y = cy + radius * 0.34
+    mouth_w = radius * 0.46
+    stroke = max(2, int(radius * 0.08))
     draw.arc(
         [cx - mouth_w / 2, mouth_y - mouth_w * 0.35, cx + mouth_w / 2, mouth_y + mouth_w * 0.55],
         start=20,
