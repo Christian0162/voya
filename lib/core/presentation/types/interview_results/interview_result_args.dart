@@ -6,7 +6,7 @@ import 'package:voya/core/domain/interview_setup/entities/interview_configuratio
 /// result screen so the freshly computed result and transcript don't need a
 /// round trip through storage. When a result is opened later from History,
 /// only [result] is available (transcript detail isn't persisted — see
-/// InterviewRepositoryImpl) and [turns] is empty.
+/// SupabaseInterviewRepository) and [turns] is empty.
 class InterviewResultArgs {
   const InterviewResultArgs({
     required this.result,
