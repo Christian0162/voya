@@ -46,3 +46,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Local secrets — GEMINI_API_KEY etc. Copy .env.example to .env and fill it
+# in; .env itself must never be committed.
+.env

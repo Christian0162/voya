@@ -49,6 +49,10 @@ dependencies:
   # allows Material Icons "where appropriate").
   google_fonts: ^6.2.1
 
+  # Vector rendering for the one icon that can't be a Material glyph (the
+  # Google "G" mark on the sign-in button — see assets/icons/google_logo.svg).
+  flutter_svg: ^2.0.10+1
+
   # Voice
   speech_to_text: ^7.0.0
   flutter_tts: ^4.2.0
@@ -64,12 +68,21 @@ dependencies:
   # 2D AI avatar
   rive: ^0.13.20
 
+  # Gemini-backed AIInterviewService (optional — see GeminiAIInterviewService)
+  http: ^1.6.0
+  flutter_dotenv: ^6.0.1
+
+  # Auth + backend/database (accounts, interview history, profile avatars)
+  supabase_flutter: ^2.9.1
+  image_picker: ^1.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   bloc_test: ^10.0.0
   mocktail: ^1.0.4
   flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.6
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -92,6 +105,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/rive/voya-character.riv
+    - assets/icons/google_logo.svg
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -125,16 +140,29 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   image_path: "assets/icon/app_icon.png"
   min_sdk_android: 21
-  adaptive_icon_background: "#4F46E5"
+  adaptive_icon_background: "assets/icon/app_icon_background.png"
   adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
   web:
     generate: true
     image_path: "assets/icon/app_icon.png"
-    background_color: "#4F46E5"
-    theme_color: "#4F46E5"
+    background_color: "#6E58E9"
+    theme_color: "#6E58E9"
   windows:
     generate: true
     image_path: "assets/icon/app_icon.png"
   macos:
     generate: true
     image_path: "assets/icon/app_icon.png"
+
+flutter_native_splash:
+  background_image: "assets/icon/splash_background.png"
+  background_image_dark: "assets/icon/splash_background_dark.png"
+  image: "assets/icon/splash_logo.png"
+  android_12:
+    image: "assets/icon/app_icon_foreground.png"
+    icon_background_color: "#6E58E9"
+    icon_background_color_dark: "#6E58E9"
+  android: true
+  ios: true
+  web: false
+  fullscreen: true
