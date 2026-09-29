@@ -29,6 +29,7 @@ class _InterviewSetupTemplatePreviewState extends State<InterviewSetupTemplatePr
         difficulty: null,
         duration: 10,
         canContinue: false,
+        isStarting: false,
         onCountrySelected: (_) {},
         onPurposeSelected: (_) {},
         onDifficultySelected: (_) {},

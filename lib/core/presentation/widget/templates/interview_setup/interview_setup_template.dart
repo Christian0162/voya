@@ -8,6 +8,7 @@ import 'package:voya/core/presentation/widget/atoms/md_primary_button.dart';
 import 'package:voya/core/presentation/widget/molecules/md_country_selector.dart';
 import 'package:voya/core/presentation/widget/molecules/md_difficulty_selector.dart';
 import 'package:voya/core/presentation/widget/molecules/md_duration_selector.dart';
+import 'package:voya/core/presentation/widget/molecules/md_mascot_avatar.dart';
 import 'package:voya/core/presentation/widget/molecules/md_purpose_selector.dart';
 import 'package:voya/core/presentation/widget/molecules/md_setup_step_header.dart';
 
@@ -25,6 +26,7 @@ class InterviewSetupTemplate extends StatelessWidget {
     required this.difficulty,
     required this.duration,
     required this.canContinue,
+    required this.isStarting,
     required this.onCountrySelected,
     required this.onPurposeSelected,
     required this.onDifficultySelected,
@@ -41,6 +43,13 @@ class InterviewSetupTemplate extends StatelessWidget {
   final InterviewDifficulty? difficulty;
   final int duration;
   final bool canContinue;
+
+  /// True for the brief window between tapping "Start Interview" and the
+  /// route transition to the interview screen landing — swaps the button
+  /// into a spinner so the tap gives immediate feedback instead of the
+  /// screen appearing to do nothing for a moment.
+  final bool isStarting;
+
   final ValueChanged<Country> onCountrySelected;
   final ValueChanged<InterviewPurpose> onPurposeSelected;
   final ValueChanged<InterviewDifficulty> onDifficultySelected;
@@ -56,7 +65,7 @@ class InterviewSetupTemplate extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: onBack,
+          onPressed: isStarting ? null : onBack,
           tooltip: 'Back',
         ),
       ),
@@ -108,6 +117,7 @@ class InterviewSetupTemplate extends StatelessWidget {
                 label: isLastStep ? 'Start Interview' : 'Continue',
                 onPressed: canContinue ? onNext : null,
                 icon: isLastStep ? Icons.mic_rounded : null,
+                isLoading: isLastStep && isStarting,
               ),
             ),
           ],
@@ -122,11 +132,27 @@ class InterviewSetupTemplate extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MdSetupStepHeader(
-            title: title,
-            subtitle: subtitle,
-            stepIndex: step,
-            stepCount: stepCount,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: MdSetupStepHeader(
+                  title: title,
+                  subtitle: subtitle,
+                  stepIndex: step,
+                  stepCount: stepCount,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              // The mascot "dressed" for the chosen country — a small,
+              // constant reminder of who's about to interview the user,
+              // visible through every step of the wizard, not just the
+              // country one.
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.md),
+                child: MdMascotAvatar(country: country, size: 68),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.xl),
           Expanded(child: child),

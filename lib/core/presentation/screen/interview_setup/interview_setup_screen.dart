@@ -28,6 +28,11 @@ class _InterviewSetupScreenState extends State<InterviewSetupScreen> {
   InterviewDifficulty? _difficulty;
   int _duration = 10;
 
+  // True for the brief window between tapping "Start Interview" and the
+  // route transition to the interview screen actually landing — without it,
+  // that tap gave no feedback at all and felt like it hadn't registered.
+  bool _isStarting = false;
+
   static const _stepCount = 4;
 
   bool get _canContinue {
@@ -45,6 +50,8 @@ class _InterviewSetupScreenState extends State<InterviewSetupScreen> {
 
   void _next() {
     if (_step == _stepCount - 1) {
+      if (_isStarting) return; // ignore a double-tap while already starting
+      setState(() => _isStarting = true);
       widget.onConfigured(
         InterviewConfiguration(
           country: _country!,
@@ -88,6 +95,7 @@ class _InterviewSetupScreenState extends State<InterviewSetupScreen> {
       difficulty: _difficulty,
       duration: _duration,
       canContinue: _canContinue,
+      isStarting: _isStarting,
       onCountrySelected: (c) => setState(() => _country = c),
       onPurposeSelected: (p) => setState(() => _purpose = p),
       onDifficultySelected: (d) => setState(() => _difficulty = d),
