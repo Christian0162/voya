@@ -40,6 +40,10 @@ class AiProviderFailure extends Failure {
     : super(reason ?? 'The AI interviewer is unavailable right now.');
 }
 
+class AuthFailure extends Failure {
+  const AuthFailure([String? reason]) : super(reason ?? "We couldn't sign you in right now.");
+}
+
 class UnknownFailure extends Failure {
   const UnknownFailure([String? reason]) : super(reason ?? 'Something went wrong.');
 }
