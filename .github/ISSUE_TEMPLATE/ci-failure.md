@@ -39,4 +39,5 @@ or ship the app until this is fixed.
    flutter build apk --debug
    ```
 3. Push a fix. If CI fails again on `main`, this same issue will be updated
-   rather than a duplicate being filed — close it once a run goes green.
+   rather than a duplicate being filed. Once a run on `main` goes green,
+   this issue is closed automatically.
