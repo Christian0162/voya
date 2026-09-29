@@ -63,7 +63,7 @@ dependencies:
 
   # IDs & value utilities
   uuid: ^4.5.1
-  intl: ^0.19.0
+  intl: ^0.20.3
 
   # 2D AI avatar
   rive: ^0.13.20
