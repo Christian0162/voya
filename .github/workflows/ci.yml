@@ -114,7 +114,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v9
         with:
           script: |
             // Matches the stable title in .github/ISSUE_TEMPLATE/ci-failure.md.
