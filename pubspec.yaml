@@ -59,7 +59,7 @@ dependencies:
   permission_handler: ^11.3.1
 
   # Local persistence for MVP history (swappable for a real backend later)
-  shared_preferences: ^2.3.3
+  shared_preferences: ^2.5.6
 
   # IDs & value utilities
   uuid: ^4.5.1
