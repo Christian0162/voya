@@ -73,7 +73,7 @@ dependencies:
   flutter_dotenv: ^6.0.1
 
   # Auth + backend/database (accounts, interview history, profile avatars)
-  supabase_flutter: ^2.9.1
+  supabase_flutter: ^2.18.3
   image_picker: ^1.1.2
 
 dev_dependencies:
