@@ -51,7 +51,7 @@ dependencies:
 
   # Vector rendering for the one icon that can't be a Material glyph (the
   # Google "G" mark on the sign-in button — see assets/icons/google_logo.svg).
-  flutter_svg: ^2.0.10+1
+  flutter_svg: ^2.3.2
 
   # Voice
   speech_to_text: ^7.0.0
